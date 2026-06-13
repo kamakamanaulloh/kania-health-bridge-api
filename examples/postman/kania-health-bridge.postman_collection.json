@@ -1,0 +1,36 @@
+{
+  "info": {
+    "name": "Kania Health Bridge API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/v1/health"
+      }
+    },
+    {
+      "name": "SATUSEHAT Encounter",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-BRIDGE-KEY",
+            "value": "{{bridge_key}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/v1/satusehat/encounter",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"no_rawat\": \"2026/06/11/000001\", \"patient_ihs\": \"P020123456\", \"practitioner_ihs\": \"100009880728\", \"organization_id\": \"ORG_ID\", \"period_start\": \"2026-06-11 08:00:00\", \"period_end\": \"2026-06-11 08:30:00\"}"
+        }
+      }
+    }
+  ]
+}

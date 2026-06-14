@@ -1,101 +1,26 @@
 # Kania Health Bridge API
 
-**Kania Health Bridge API** adalah project open-source berbasis **Laravel 10** yang dibuat sebagai API bridge ringan untuk membantu integrasi SIMRS/RME/HIS dengan layanan kesehatan Indonesia seperti **BPJS VClaim, Antrol, iCare, Apotek Online, dan SATUSEHAT**.
+API bridge ringan dan open-source untuk membantu SIMRS/RME/HIS berkomunikasi dengan **BPJS VClaim**, **EMR/RME BPJS**, **Antrol**, **iCare**, **Apotek Online**, dan **SATUSEHAT**.
 
-Project ini dibuat tanpa login dan tanpa portal dashboard, sehingga fokus utamanya adalah sebagai **middleware API** yang dapat dipasang di server lokal maupun server online untuk menjadi penghubung antara SIMRS dan layanan eksternal.
+Project ini **tanpa login dan tanpa portal**. Fokusnya adalah menjadi middleware/API gateway yang bisa di-clone dari GitHub, dipasang di server RS/klinik/vendor, lalu dipanggil dari SIMRS.
 
----
+## Pembeda Utama
 
-## Tujuan Project
+- **RAW Mode**: SIMRS mengirim payload asli sesuai API tujuan.
+- **MAPPER Mode**: SIMRS mengirim payload sederhana, bridge yang mengubah ke format BPJS/SATUSEHAT.
+- **Standard Response**: semua response sukses/error dibuat seragam.
+- **Request-Response Log**: setiap hit ke BPJS/SATUSEHAT tersimpan di database.
+- **Token Cache SATUSEHAT**: token disimpan agar tidak request token terus-menerus.
+- **BPJS Response Decrypt Helper**: helper decrypt response BPJS + LZString tersedia.
+- **EMR/RME BPJS Bridge**: endpoint raw dan mapper untuk kunjungan, diagnosa, tindakan, resep, lab, radiologi, dan resume medis.
+- **Contoh Integrasi**: tersedia contoh PHP native, CodeIgniter, Laravel, dan Postman.
 
-Project ini dibuat untuk membantu developer SIMRS agar tidak perlu membangun proses bridging dari nol.
+## Stack
 
-Dengan Kania Health Bridge API, SIMRS cukup mengirim request ke endpoint bridge, lalu sistem akan membantu proses:
-
-* Validasi request
-* Mapping payload sederhana dari SIMRS
-* Pengiriman request ke BPJS / SATUSEHAT
-* Token cache SATUSEHAT
-* Signature BPJS
-* Logging request dan response
-* Standarisasi response API
-
----
-
-## Cara Kerja
-
-```text
-SIMRS / RME / HIS
-      ↓
-Kania Health Bridge API
-      ↓
-BPJS / Antrol / iCare / Apotek Online / SATUSEHAT
-```
-
----
-
-## Fitur Utama
-
-* API bridge tanpa login
-* Middleware keamanan menggunakan `X-BRIDGE-KEY`
-* Health check endpoint
-* BPJS VClaim bridge
-* Antrol bridge
-* SATUSEHAT bridge
-* RAW mode untuk payload asli
-* MAPPER mode untuk payload sederhana dari SIMRS
-* Standard response API
-* Request dan response log
-* Token cache SATUSEHAT
-* Helper signature BPJS
-* Helper decrypt response BPJS
-* Mapper Encounter SATUSEHAT
-* Mapper Condition SATUSEHAT
-* Mapper Observation SATUSEHAT
-* Mapper SEP BPJS
-* Mapper Antrol
-* Dokumentasi endpoint
-* Contoh integrasi Native PHP
-* Contoh integrasi CodeIgniter 3
-* Contoh integrasi Laravel 10
-* Postman Collection
-
----
-
-## Pembeda Project Ini
-
-Project ini tidak hanya menyediakan endpoint API biasa, tetapi juga menyediakan konsep **bridge adapter** untuk memudahkan SIMRS lain melakukan integrasi.
-
-Pembeda utamanya adalah:
-
-1. **RAW Mode**
-   SIMRS dapat mengirim payload sesuai format asli BPJS atau SATUSEHAT.
-
-2. **MAPPER Mode**
-   SIMRS dapat mengirim payload sederhana, lalu bridge API akan membantu mengubahnya menjadi format yang dibutuhkan layanan tujuan.
-
-3. **Standard Response**
-   Semua response dibuat seragam agar lebih mudah dibaca oleh SIMRS.
-
-4. **Request-Response Log**
-   Setiap request dan response dapat dicatat untuk memudahkan debugging.
-
-5. **Reusable untuk Banyak SIMRS**
-   Project ini dapat digunakan oleh SIMRS berbasis Laravel, CodeIgniter, Native PHP, atau framework lain.
-
----
-
-## Tech Stack
-
-* Laravel 10
-* PHP 8.1
-* MySQL / MariaDB
-* Guzzle HTTP Client
-* Laravel Migration
-* Laravel Middleware
-* Laravel Service Layer
-
----
+- Laravel 10
+- PHP 8.1+
+- MySQL/MariaDB
+- Guzzle HTTP
 
 ## Instalasi
 
@@ -109,74 +34,63 @@ php artisan migrate
 php artisan serve
 ```
 
----
+Tes:
 
-## Konfigurasi ENV
-
-Silakan isi credential sesuai layanan yang digunakan.
-
-```env
-APP_NAME="Kania Health Bridge API"
-APP_ENV=local
-APP_DEBUG=true
-APP_URL=http://localhost:8000
-
-BRIDGE_ENV=sandbox
-BRIDGE_KEY=your-secret-bridge-key
-
-BPJS_CONS_ID=
-BPJS_SECRET_KEY=
-BPJS_USER_KEY=
-BPJS_BASE_URL=
-
-ANTROL_BASE_URL=
-ANTROL_CONS_ID=
-ANTROL_SECRET_KEY=
-ANTROL_USER_KEY=
-
-SATUSEHAT_CLIENT_ID=
-SATUSEHAT_CLIENT_SECRET=
-SATUSEHAT_AUTH_URL=
-SATUSEHAT_BASE_URL=
-SATUSEHAT_ORGANIZATION_ID=
+```bash
+curl http://localhost:8000/api/v1/health
 ```
 
----
+## Konfigurasi
 
-## Header API
+Edit `.env`:
 
-Setiap request ke endpoint bridge wajib menyertakan header berikut:
+```env
+BRIDGE_KEY=isi-key-rahasia
+BRIDGE_ENV=sandbox
+
+BPJS_CONS_ID=...
+BPJS_SECRET_KEY=...
+BPJS_USER_KEY=...
+BPJS_BASE_URL=...
+
+ANTROL_CONS_ID=...
+ANTROL_SECRET_KEY=...
+ANTROL_USER_KEY=...
+ANTROL_BASE_URL=...
+
+BPJS_EMR_BASE_URL=...
+BPJS_EMR_ENDPOINT_KUNJUNGAN=emr/kunjungan
+BPJS_EMR_ENDPOINT_DIAGNOSA=emr/diagnosa
+BPJS_EMR_ENDPOINT_TINDAKAN=emr/tindakan
+BPJS_EMR_ENDPOINT_RESEP=emr/resep
+BPJS_EMR_ENDPOINT_LABORATORIUM=emr/laboratorium
+BPJS_EMR_ENDPOINT_RADIOLOGI=emr/radiologi
+BPJS_EMR_ENDPOINT_RESUME=emr/resume
+
+SATUSEHAT_CLIENT_ID=...
+SATUSEHAT_CLIENT_SECRET=...
+SATUSEHAT_AUTH_URL=...
+SATUSEHAT_BASE_URL=...
+SATUSEHAT_ORGANIZATION_ID=...
+```
+
+Setiap request selain health wajib mengirim header:
 
 ```http
-X-BRIDGE-KEY: your-secret-bridge-key
+X-BRIDGE-KEY: isi-key-rahasia
 Accept: application/json
 Content-Type: application/json
 ```
 
----
+## Endpoint Utama
 
-## Health Check
+### Health
 
 ```http
 GET /api/v1/health
 ```
 
-Contoh response:
-
-```json
-{
-  "success": true,
-  "message": "Kania Health Bridge API is running",
-  "version": "1.0.0",
-  "environment": "sandbox"
-}
-```
-
----
-
-## Endpoint Utama
-
-### BPJS
+### BPJS VClaim
 
 ```http
 GET  /api/v1/bpjs/peserta/nik/{nik}
@@ -186,6 +100,47 @@ GET  /api/v1/bpjs/referensi/diagnosa/{keyword}
 POST /api/v1/bpjs/sep
 ```
 
+
+### BPJS EMR / RME
+
+```http
+GET  /api/v1/bpjs/emr/status
+POST /api/v1/bpjs/emr/kunjungan
+POST /api/v1/bpjs/emr/diagnosa
+POST /api/v1/bpjs/emr/tindakan
+POST /api/v1/bpjs/emr/resep
+POST /api/v1/bpjs/emr/laboratorium
+POST /api/v1/bpjs/emr/radiologi
+POST /api/v1/bpjs/emr/resume
+POST /api/v1/bpjs/emr/raw/{path}
+```
+
+Contoh EMR Kunjungan Mapper:
+
+```json
+{
+  "no_rawat": "2026/06/11/000001",
+  "no_sep": "0301R0010626V000001",
+  "no_kartu": "0001234567890",
+  "nik": "357xxxxxxxxxxxxx",
+  "nama_pasien": "Budi Santoso",
+  "tgl_kunjungan": "2026-06-11",
+  "kode_poli": "INT",
+  "nama_poli": "Penyakit Dalam",
+  "kode_dokter": "12345",
+  "nama_dokter": "dr. Ahmad",
+  "keluhan_utama": "Demam dan batuk",
+  "sistole": 120,
+  "diastole": 80,
+  "nadi": 88,
+  "respirasi": 20,
+  "suhu": 37.5,
+  "spo2": 98
+}
+```
+
+Dokumentasi lengkap ada di `docs/bpjs-emr.md`.
+
 ### Antrol
 
 ```http
@@ -194,7 +149,7 @@ POST /api/v1/antrol/taskid
 POST /api/v1/antrol/batal
 ```
 
-### SATUSEHAT
+### SATUSEHAT Mapper Mode
 
 ```http
 GET  /api/v1/satusehat/token
@@ -210,7 +165,30 @@ POST /api/v1/raw/bpjs/{profile}/{path}
 POST /api/v1/raw/satusehat/{resource}
 ```
 
----
+Contoh RAW BPJS:
+
+```http
+POST /api/v1/raw/bpjs/vclaim/SEP/2.0/insert
+```
+
+Contoh RAW SATUSEHAT:
+
+```http
+POST /api/v1/raw/satusehat/Encounter
+```
+
+## Contoh Request SATUSEHAT Encounter Mapper
+
+```json
+{
+  "no_rawat": "2026/06/11/000001",
+  "patient_ihs": "P020123456",
+  "practitioner_ihs": "100009880728",
+  "organization_id": "761ecdde-9a94-499e-8594-13075fa82dbd",
+  "period_start": "2026-06-11 08:00:00",
+  "period_end": "2026-06-11 08:30:00"
+}
+```
 
 ## Contoh Response Sukses
 
@@ -219,18 +197,14 @@ POST /api/v1/raw/satusehat/{resource}
   "success": true,
   "service": "satusehat",
   "module": "encounter",
-  "message": "Encounter berhasil dikirim",
-  "data": {
-    "resource_id": "example-resource-id"
-  },
+  "message": "Request SATUSEHAT berhasil",
+  "data": {},
   "meta": {
-    "request_id": "REQ-20260611-000001",
+    "request_id": "REQ-20260611-101010-ABC123",
     "duration_ms": 845
   }
 }
 ```
-
----
 
 ## Contoh Response Error
 
@@ -239,95 +213,21 @@ POST /api/v1/raw/satusehat/{resource}
   "success": false,
   "service": "satusehat",
   "module": "encounter",
-  "message": "Gagal mengirim Encounter",
+  "message": "Payload tidak valid",
   "error": {
     "code": "VALIDATION_ERROR",
     "detail": "patient_ihs wajib diisi"
   },
   "meta": {
-    "request_id": "REQ-20260611-000002",
-    "duration_ms": 120
+    "request_id": "REQ-20260611-101010-ABC123"
   }
 }
 ```
 
----
-
 ## Catatan Penting
 
-Project ini hanya menyediakan engine/API bridge. Untuk dapat terhubung ke layanan production seperti BPJS dan SATUSEHAT, pengguna tetap membutuhkan credential resmi dari masing-masing layanan atau fasyankes terkait.
-
-Credential seperti `cons_id`, `secret_key`, `user_key`, `client_id`, dan `client_secret` tidak disertakan dalam repository.
-
----
-
-## Roadmap
-
-### Version 1.0.0
-
-* Core bridge API
-* Bridge key middleware
-* Standard response helper
-* API log
-* SATUSEHAT token cache
-* BPJS request signer
-* Health check endpoint
-* RAW mode basic
-* MAPPER mode basic
-
-### Version 1.1.0
-
-* BPJS peserta
-* BPJS referensi
-* BPJS SEP
-* Antrol antrean
-* SATUSEHAT Encounter
-* SATUSEHAT Condition
-
-### Version 1.2.0
-
-* SATUSEHAT Observation
-* SATUSEHAT Procedure
-* SATUSEHAT MedicationRequest
-* SATUSEHAT MedicationDispense
-* iCare bridge
-* Apotek Online bridge
-
-### Version 2.0.0
-
-* Retry failed request
-* Queue support
-* Webhook callback
-* Multi credential profile
-* Docker support
-* More SIMRS adapter examples
-
----
-
-## Target Pengguna
-
-Project ini cocok digunakan oleh:
-
-* Developer SIMRS
-* Vendor RME
-* Rumah sakit
-* Klinik
-* Puskesmas
-* Komunitas IT kesehatan
-* Mahasiswa atau programmer yang ingin belajar integrasi SIMRS
-
----
+Project ini sudah menyiapkan struktur, endpoint, mapping, logging, security key, token cache, dan HTTP client. Agar koneksi benar-benar berjalan ke BPJS/SATUSEHAT production, Anda tetap harus mengisi credential resmi dari BPJS/Kemenkes dan menyesuaikan base URL serta path endpoint sesuai environment dan dokumentasi resmi. Khusus modul EMR/RME BPJS, path endpoint dibuat configurable karena implementasi dan akses dapat berbeda pada masing-masing fasyankes.
 
 ## License
 
 MIT License
-
-Project ini dirilis secara open-source untuk membantu ekosistem SIMRS dan integrasi kesehatan digital di Indonesia.
-
----
-
-## Kontribusi
-
-Kontribusi sangat terbuka untuk developer SIMRS, vendor RME, rumah sakit, klinik, puskesmas, dan komunitas IT kesehatan.
-
-Silakan fork repository ini, buat branch baru, lalu ajukan pull request.

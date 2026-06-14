@@ -18,7 +18,7 @@
         "header": [
           {
             "key": "X-BRIDGE-KEY",
-            "value": "{{bridge_key}"
+            "value": "{{bridge_key}}"
           },
           {
             "key": "Content-Type",
@@ -31,6 +31,153 @@
           "raw": "{\"no_rawat\": \"2026/06/11/000001\", \"patient_ihs\": \"P020123456\", \"practitioner_ihs\": \"100009880728\", \"organization_id\": \"ORG_ID\", \"period_start\": \"2026-06-11 08:00:00\", \"period_end\": \"2026-06-11 08:30:00\"}"
         }
       }
+    },
+    {
+      "name": "BPJS EMR / RME",
+      "item": [
+        {
+          "name": "Status Konfigurasi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-BRIDGE-KEY",
+                "value": "{{bridge_key}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/bpjs/emr/status"
+          }
+        },
+        {
+          "name": "EMR Kunjungan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-BRIDGE-KEY",
+                "value": "{{bridge_key}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/bpjs/emr/kunjungan",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"no_rawat\": \"2026/06/11/000001\", \"no_sep\": \"0301R0010626V000001\", \"no_kartu\": \"0001234567890\", \"nik\": \"357xxxxxxxxxxxxx\", \"nama_pasien\": \"Budi Santoso\", \"tgl_kunjungan\": \"2026-06-11\", \"kode_poli\": \"INT\", \"nama_poli\": \"Penyakit Dalam\", \"kode_dokter\": \"12345\", \"nama_dokter\": \"dr. Ahmad\", \"keluhan_utama\": \"Demam dan batuk\", \"sistole\": 120, \"diastole\": 80, \"nadi\": 88, \"respirasi\": 20, \"suhu\": 37.5, \"spo2\": 98}"
+            }
+          }
+        },
+        {
+          "name": "EMR Diagnosa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-BRIDGE-KEY",
+                "value": "{{bridge_key}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/bpjs/emr/diagnosa",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"no_rawat\": \"2026/06/11/000001\", \"no_sep\": \"0301R0010626V000001\", \"diagnosa\": [{\"kode\": \"J06.9\", \"nama\": \"Acute upper respiratory infection, unspecified\", \"tipe\": \"primer\"}]}"
+            }
+          }
+        },
+        {
+          "name": "EMR Tindakan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-BRIDGE-KEY",
+                "value": "{{bridge_key}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/bpjs/emr/tindakan",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"no_rawat\": \"2026/06/11/000001\", \"tindakan\": [{\"kode\": \"89.01\", \"nama\": \"Interview and evaluation\", \"tanggal\": \"2026-06-11\", \"jumlah\": 1, \"dokter\": \"dr. Ahmad\"}]}"
+            }
+          }
+        },
+        {
+          "name": "EMR Resep",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-BRIDGE-KEY",
+                "value": "{{bridge_key}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/bpjs/emr/resep",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"no_rawat\": \"2026/06/11/000001\", \"no_resep\": \"RSP-000001\", \"tanggal_resep\": \"2026-06-11\", \"obat\": [{\"kode\": \"OBT001\", \"nama\": \"Paracetamol 500 mg\", \"jumlah\": 10, \"satuan\": \"tablet\", \"aturan_pakai\": \"3x1 sesudah makan\"}]}"
+            }
+          }
+        },
+        {
+          "name": "EMR Raw",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-BRIDGE-KEY",
+                "value": "{{bridge_key}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/bpjs/emr/raw/emr/kunjungan",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"contoh\": \"payload resmi BPJS dikirim apa adanya\"}"
+            }
+          }
+        }
+      ]
     }
   ]
 }

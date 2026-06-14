@@ -13,13 +13,21 @@ class BpjsRequestService
     public function request(string $profile, string $method, string $path, array $payload = [], ?string $module = null): array
     {
         $config = config("bpjs.$profile");
+        if (!$config || empty($config['base_url'])) {
+            return ['ok'=>false,'status'=>422,'body'=>['message'=>"Konfigurasi BPJS profile '$profile' belum lengkap. Isi base_url dan credential di .env."],'duration_ms'=>0,'request_id'=>'REQ-'.now()->format('Ymd-His').'-'.Str::upper(Str::random(6))];
+        }
         $requestId = 'REQ-'.now()->format('Ymd-His').'-'.Str::upper(Str::random(6));
         request()->attributes->set('request_id', $requestId);
         $start = microtime(true);
         $url = rtrim((string) ($config['base_url'] ?? ''), '/') . '/' . ltrim($path, '/');
         $headers = $this->signature->headers($config);
         $options = ['headers' => array_merge($headers, ['Accept' => 'application/json','Content-Type' => 'application/json']), 'timeout' => config('bridge.timeout')];
-        if (in_array(strtoupper($method), ['POST','PUT','PATCH','DELETE'], true)) $options['json'] = $payload;
+        if (strtoupper($method) === 'GET' && !empty($payload)) {
+            $options['query'] = $payload;
+        }
+        if (in_array(strtoupper($method), ['POST','PUT','PATCH','DELETE'], true)) {
+            $options['json'] = $payload;
+        }
 
         try {
             $client = new Client(['http_errors' => false]);

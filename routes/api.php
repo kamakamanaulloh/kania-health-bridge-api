@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\Api\V1\AntrolController;
 use App\Http\Controllers\Api\V1\BpjsController;
+use App\Http\Controllers\Api\V1\BpjsEmrController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\LogController;
 use App\Http\Controllers\Api\V1\SatuSehatController;
@@ -18,6 +19,20 @@ Route::prefix('v1')->group(function () {
             Route::get('referensi/poli/{keyword}', [BpjsController::class, 'referensiPoli']);
             Route::get('referensi/diagnosa/{keyword}', [BpjsController::class, 'referensiDiagnosa']);
             Route::post('sep', [BpjsController::class, 'sep']);
+        });
+
+
+
+        Route::prefix('bpjs/emr')->group(function () {
+            Route::get('status', [BpjsEmrController::class, 'status']);
+            Route::post('kunjungan', [BpjsEmrController::class, 'kunjungan']);
+            Route::post('diagnosa', [BpjsEmrController::class, 'diagnosa']);
+            Route::post('tindakan', [BpjsEmrController::class, 'tindakan']);
+            Route::post('resep', [BpjsEmrController::class, 'resep']);
+            Route::post('laboratorium', [BpjsEmrController::class, 'laboratorium']);
+            Route::post('radiologi', [BpjsEmrController::class, 'radiologi']);
+            Route::post('resume', [BpjsEmrController::class, 'resume']);
+            Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], 'raw/{path}', [BpjsEmrController::class, 'raw'])->where('path', '.*');
         });
 
         Route::prefix('antrol')->group(function () {
